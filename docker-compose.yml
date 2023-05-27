@@ -18,6 +18,7 @@ services:
       #- 25575:25575 # remote RCON
     volumes:
       - data:/data
+      - ./ops.json:/data/ops.json
     stdin_open: true
     tty: true
     restart: unless-stopped
