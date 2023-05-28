@@ -21,7 +21,7 @@ services:
       - ./ops.json:/data/ops.json
     stdin_open: true
     tty: true
-    restart: unless-stopped
+    #restart: unless-stopped
 
   overviewer:  # note: doesn't update automatically
     image: python:slim
