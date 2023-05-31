@@ -5,20 +5,15 @@ services:
     image: itzg/minecraft-server
     environment:
       TYPE: PAPER
-      PAPERBUILD: 538  # as of 2023-05-25
-      RCON: "true"
-      RCON_PASSWORD: "2B58l8d84T6P"
       EULA: "true"
       MODRINTH_PROJECTS: "coreprotect"
-      SEED: "92531259"
-      MODE: "creative"
-      SERVER_NAME: "Pete's Server"
+    env_file:
+      - ./settings.env
     ports:
       - 25565:25565
-      #- 25575:25575 # remote RCON
+      - 25575:25575 # remote RCON
     volumes:
-      - data:/data
-      - ./ops.json:/data/ops.json
+      - ./data:/data
     stdin_open: true
     tty: true
     #restart: unless-stopped
@@ -35,12 +30,11 @@ services:
   overviewer-gen:
     image: marctv/minecraft-overviewer
     volumes:
-      - data:/tmp/server:ro
+      - ./data:/tmp/server:ro
       - ./overviewer-config.py:/tmp/config/config.py:ro
       - overviewer:/tmp/export
     profiles:
       - tools
 
 volumes:
-  data:
   overviewer:
