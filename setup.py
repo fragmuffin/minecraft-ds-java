@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 import os
 from jinja2 import Template
-from typing import Callable, Optional
-from collections import namedtuple
 
 
 def random_words(*args, delimiter:str='') -> str:
@@ -28,7 +26,7 @@ def random_password():
     ))
 
 
-def ask(question:str, default:Callable|str, default_text:Optional[str]=None) -> str:
+def ask(question, default, default_text=None):
     """
     Ask question, get answer.
     """
