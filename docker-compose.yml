@@ -6,7 +6,6 @@ services:
     environment:
       TYPE: PAPER
       EULA: "true"
-      MODRINTH_PROJECTS: "coreprotect"
     env_file:
       - ./settings.env
     ports:
