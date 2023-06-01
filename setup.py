@@ -36,6 +36,7 @@ def ask(question, default, default_text=None):
         return answer
     answer = default() if callable(default) else default
     print(f'   - {answer}')
+    return answer
 
 
 def setup(args):
