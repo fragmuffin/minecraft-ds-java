@@ -2,8 +2,6 @@
 
 ## Overview
 
-TODO: aim for minimal effort
-
 Aims:
     - minimal setup effort
     - unrestricted potential (setup now, tweak later)
@@ -23,7 +21,17 @@ Aims:
 
 - join with client (at least to test, and start playing)
 
+
+## Cron Jobs
+
+- Tasks:
+    - Backup daily (clear out after 30 days)
+    - Generate map (CPU intensive, do during expected downtime)
+- Where to symlink tasks.cron
+
+## Expose Online
 - commands in minecraft
     - whitelist on
 
 which ports to expose (and port forward)
+
