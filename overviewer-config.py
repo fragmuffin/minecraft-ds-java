@@ -109,3 +109,5 @@ renders.update({
 
 outputdir = "/tmp/export"
 defaultzoom = 5
+processes = 2  # slows generation down, but doesn't slow the server as much
+
