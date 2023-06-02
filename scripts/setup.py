@@ -38,19 +38,16 @@ def ask(question, default, default_text=None):
     return answer
 
 
-def generate_settings_env(args):
+def generate_settings_env(templates, output, random, **_):
     """
     Genreate settings environment file
     """
     filename = ('settings.env', '.jinja2')
-    filename_in = os.path.join(args.templates, ''.join(filename))
-    filename_out = os.path.join(args.output, filename[0])
-    print(f'{os.environ["PWD"]=}')
-    print(f'{filename_in=}')
-    print(f'{filename_out=}')
+    filename_in = os.path.join(templates, ''.join(filename))
+    filename_out = os.path.join(output, filename[0])
 
     if os.path.exists(filename_out):
-        replace = input(f"Output file already exists: {filename_out!r}, do you want to replace it? [Yn]")
+        replace = input(f"Output file already exists: {filename_out!r}, do you want to replace it? [yN]")
         if not replace.lower().startswith('y'):
             print('[aborting...]')
             return
@@ -64,7 +61,7 @@ def generate_settings_env(args):
     }
     answers = {}
     for (name, (question, default, default_text)) in questions.items():
-        if args.random:
+        if random:
             answers[name] = default() if callable(default) else default
         else:
             answers[name] = ask(f'{name}: {question}', default, default_text)
@@ -75,16 +72,16 @@ def generate_settings_env(args):
         file_out.write(Template(file_in.read()).render(**answers))
 
 
-def generate_tasks_cron(args):
+def generate_tasks_cron(templates, output, **_):
     """
     Genreate tasks cron file
     """
     filename = ('tasks.cron', '.jinja2')
-    filename_in = os.path.join(args.templates, ''.join(filename))
-    filename_out = os.path.join(args.output, filename[0])
+    filename_in = os.path.join(templates, ''.join(filename))
+    filename_out = os.path.join(output, filename[0])
 
     if os.path.exists(filename_out):
-        replace = input(f"Output file already exists: {filename_out!r}, do you want to replace it? [Yn]")
+        replace = input(f"Output file already exists: {filename_out!r}, do you want to replace it? [yN]")
         if not replace.lower().startswith('y'):
             print('[aborting...]')
             return
@@ -123,8 +120,8 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     try:
-        generate_settings_env(args)
-        generate_tasks_cron(args)
+        generate_settings_env(**vars(args))
+        generate_tasks_cron(**vars(args))
     except KeyboardInterrupt:
         print("\n[cancelled]")
 
