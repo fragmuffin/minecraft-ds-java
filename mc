@@ -24,10 +24,8 @@ Containers:
     $ ./mc logs [service]   Display and follow logs
 
 Tooling
-  Overviewer
+    $ ./mc rcon             RCON interface to server (must be running)
     $ ./mc map              Genreate overviewer map files
-
-  Backup
     $ ./mc backup           Create incremental backup of server
 
 ENDHELPTEXT
@@ -77,6 +75,10 @@ logs() {
 
 
 # ====================== Tools ======================
+rcon() {
+    docker-compose exec ds-java rcon-cli "$@"
+}
+
 map() {
     docker-compose run --rm overviewer-gen
 }
@@ -104,6 +106,7 @@ case "$1" in
     logs)       logs "${@:2}" ;;
 
     # Tools:
+    rcon)       rcon "${@:2}" ;;
     map)        map "${@:2}" ;;
     backup)     backup "${@:2}" ;;
 
