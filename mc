@@ -33,7 +33,7 @@ ENDHELPTEXT
 
 # ====================== Setup ======================
 init() {
-    python setup.py
+    python scripts/setup.py "$@"
 }
 
 # ====================== Container Control ======================

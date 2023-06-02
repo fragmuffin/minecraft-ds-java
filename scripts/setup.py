@@ -2,7 +2,6 @@
 import os
 from jinja2 import Template
 
-
 def random_words(*args, delimiter:str='') -> str:
     import wonderwords
     randomword = wonderwords.RandomWord()
@@ -39,9 +38,19 @@ def ask(question, default, default_text=None):
     return answer
 
 
-def setup(args):
-    if os.path.exists(args.output):
-        replace = input(f"Output file already exists: {args.output!r}, do you want to replace it? [Yn]")
+def generate_settings_env(args):
+    """
+    Genreate settings environment file
+    """
+    filename = ('settings.env', '.jinja2')
+    filename_in = os.path.join(args.templates, ''.join(filename))
+    filename_out = os.path.join(args.output, filename[0])
+    print(f'{os.environ["PWD"]=}')
+    print(f'{filename_in=}')
+    print(f'{filename_out=}')
+
+    if os.path.exists(filename_out):
+        replace = input(f"Output file already exists: {filename_out!r}, do you want to replace it? [Yn]")
         if not replace.lower().startswith('y'):
             print('[aborting...]')
             return
@@ -61,29 +70,50 @@ def setup(args):
             answers[name] = ask(f'{name}: {question}', default, default_text)
 
     # Render to File
-    with open(args.template, 'r') as file_in, open(args.output, 'w') as file_out:
+    with open(filename_in, 'r') as file_in, open(filename_out, 'w') as file_out:
+        print(f"Writing: {filename_out!r}")
         file_out.write(Template(file_in.read()).render(**answers))
+
+
+def generate_tasks_cron(args):
+    """
+    Genreate tasks cron file
+    """
+    filename = ('tasks.cron', '.jinja2')
+    filename_in = os.path.join(args.templates, ''.join(filename))
+    filename_out = os.path.join(args.output, filename[0])
+
+    if os.path.exists(filename_out):
+        replace = input(f"Output file already exists: {filename_out!r}, do you want to replace it? [Yn]")
+        if not replace.lower().startswith('y'):
+            print('[aborting...]')
+            return
+
+    # Render to File
+    with open(filename_in, 'r') as file_in, open(filename_out, 'w') as file_out:
+        print(f"Writing: {filename_out!r}")
+        file_out.write(Template(file_in.read()).render(**os.environ))
 
 
 if __name__ == '__main__':
     import argparse
 
-    DEFAULT_TEMPLATE = 'settings.env.jinja2'
-    DEFAULT_OUTPUT = 'settings.env'
+    DEFAULT_TEMPLATES = os.path.relpath(os.path.join(os.path.dirname(__file__), 'templates'), os.getcwd())
+    DEFAULT_OUTPUT = os.path.relpath(os.path.join(os.path.dirname(__file__), '..'), os.getcwd())
 
     parser = argparse.ArgumentParser(
         description="Set minecraft server's initial environment",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 
-    group = parser.add_argument_group('Files')
+    group = parser.add_argument_group('File Paths')
     group.add_argument(
-        '--template', '-t', default=DEFAULT_TEMPLATE,
-        help="Template environment file",
+        '--templates', '-t', default=DEFAULT_TEMPLATES,
+        help="Folder containing templates",
     )
     group.add_argument(
         '--output', '-o', default=DEFAULT_OUTPUT,
-        help="Output environment file.",
+        help="Folder to write outputs to",
     )
 
     parser.add_argument(
@@ -93,7 +123,8 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     try:
-        setup(args)
+        generate_settings_env(args)
+        generate_tasks_cron(args)
     except KeyboardInterrupt:
         print("\n[cancelled]")
 
