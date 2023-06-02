@@ -84,7 +84,7 @@ map() {
 }
 
 backup() {
-    bash backup.sh
+    bash scripts/backup.sh
 }
 
 # ====================== Mainline ======================

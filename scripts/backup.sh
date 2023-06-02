@@ -2,7 +2,7 @@
 # A script to perform incremental backups using rsync
 # source: https://linuxconfig.org/how-to-create-incremental-backups-using-rsync-on-linux
 set -ueo pipefail
-cd $(dirname $0)
+cd $(dirname $0)/..
 
 # Paths
 readonly SOURCE_DIR="$PWD/data"
