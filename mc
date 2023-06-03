@@ -80,6 +80,9 @@ rcon() {
 }
 
 map() {
+    # bugfix: cron job
+    # mitigation for "docker-compose: command not found"... root cause unknown
+    export PATH=$PATH:/usr/local/bin
     docker-compose run --rm overviewer-gen
 }
 
