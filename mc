@@ -14,17 +14,20 @@ Host Setup:
 
 Containers:
   Service Control:
-    $ ./mc build [service]  Builds docker containers
-    $ ./mc start [service]  Start services ("all" also starts tools)
-    $ ./mc stop [service]   Stop all services
-    $ ./mc down             Stops and removes running images
+    $ ./mc build [service]  Builds docker containers (optional)
+    $ ./mc start [service]  Start services
+    $ ./mc stop [service]   Stop services
+    $ ./mc down             Stops and removes running containers
 
   Status & Logs:
     $ ./mc show             Shows running containers
     $ ./mc logs [service]   Display and follow logs
 
-Tooling
+Tooling:
+  RCON Commandline Interface:
     $ ./mc rcon             RCON interface to server (must be running)
+
+  Cron tasks
     $ ./mc map              Genreate overviewer map files
     $ ./mc backup           Create incremental backup of server
 
@@ -33,6 +36,8 @@ ENDHELPTEXT
 
 # ====================== Setup ======================
 init() {
+    # TODO: change method of support, it's a bit rude to install stuff like this.
+    python -m pip install -r scripts/requirements.txt
     python scripts/setup.py "$@"
 }
 
