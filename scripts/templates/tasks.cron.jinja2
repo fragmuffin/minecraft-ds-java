@@ -1,6 +1,6 @@
 # Backup
-00 3 * * *  {{ USER }}  bash {{ PWD }}/mc backup
+00 3 * * *  {{ USER }}  bash {{ PWD }}/mc backup > {{ PWD }}/task-backup.log 2>&1
 
 # Overviewer - generate map (incremental)
-30 3 * * *  {{ USER }}  bash {{ PWD }}/mc map
+30 3 * * *  {{ USER }}  bash {{ PWD }}/mc map > {{ PWD }}/task-map.log 2>&1
 
