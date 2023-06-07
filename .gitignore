@@ -1,5 +1,11 @@
+# Folders
 backups
-data/*
-!data/.gitkeep
+data
+
+# Genreated files
 settings.env
 tasks.cron
+
+# Logs
+*.log
+
