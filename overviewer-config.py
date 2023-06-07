@@ -148,3 +148,9 @@ outputdir = "/tmp/export"
 defaultzoom = 3
 processes = 2  # slows generation down, but doesn't slow the server as much
 
+
+if (logging_level := os.environ.get('LOGGING_LEVEL', None)) in {'DEBUG', 'INFO', 'WARNING', 'CRITICAL'}:
+    import logging
+    logger = logging.getLogger()
+    logger.setLevel(getattr(logging, logging_level))
+

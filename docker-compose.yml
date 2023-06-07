@@ -39,6 +39,8 @@ services:
       #RENDER_HEATMAP: 1
       RENDER_NETHER: 1
       RENDER_END: 1
+      # Logging Level
+      LOGGING_LEVEL: INFO  # set to DEBUG to learn more
     profiles:
       - tools
 
