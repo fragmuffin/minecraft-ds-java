@@ -3,9 +3,6 @@ version: "3.8"
 services:
   ds-java:
     image: itzg/minecraft-server
-    environment:
-      TYPE: PAPER
-      EULA: "true"
     env_file:
       - ./settings.env
     ports:
