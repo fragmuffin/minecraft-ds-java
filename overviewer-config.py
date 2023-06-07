@@ -117,7 +117,8 @@ if os.environ.get('RENDER_HEATMAP', None):
         },
     })
 
-})
+
+
 
 outputdir = "/tmp/export"
 defaultzoom = 3
