@@ -29,6 +29,13 @@ services:
       - ./data:/tmp/server:ro
       - ./overviewer-config.py:/tmp/config/config.py:ro
       - overviewer:/tmp/export
+    environment:
+      # Comment out to remove renders,
+      #   or edit overviewer-config.py directly.
+      RENDER_SLICES: 1
+      RENDER_NIGHT: 1
+      RENDER_CAVES: 1
+      RENDER_HEATMAP: 1
     profiles:
       - tools
 
