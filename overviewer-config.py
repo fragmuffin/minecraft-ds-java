@@ -17,7 +17,9 @@ if OVERVIEWER_CONFIG_DEBUG := os.environ.get('OVERVIEWER_CONFIG_DEBUG', None):
 texturepath = "/tmp/overviewer/client.jar"
 
 worlds.update({
-    "My World": '/tmp/server/world',
+    "overworld": '/tmp/server/world',
+    "nether": '/tmp/server/world_nether',
+    "the_end": '/tmp/server/world_the_end',
 })
 
 # Render Modes:
@@ -37,7 +39,7 @@ worlds.update({
 # ----- Overworld
 renders.update({
     "day": {
-        "world": "My World",
+        "world": "overworld",
         "title": "Day",
         "rendermode": smooth_lighting,
         "dimension": "overworld",
@@ -57,25 +59,25 @@ if os.environ.get('RENDER_SLICES', None):
 
     renders.update({
         "slice-128": {
-            "world": "My World",
+            "world": "overworld",
             "title": "Slice: 0 -> 128",
             "rendermode": normal + slice_at(128),
             "dimension": "overworld",
         },
         "slice-96": {
-            "world": "My World",
+            "world": "overworld",
             "title": "Slice: 0 -> 96",
             "rendermode": normal + slice_at(96),
             "dimension": "overworld",
         },
         "slice-64": {
-            "world": "My World",
+            "world": "overworld",
             "title": "Slice: 0 -> 64",
             "rendermode": normal + slice_at(64),
             "dimension": "overworld",
         },
         "slice-32": {
-            "world": "My World",
+            "world": "overworld",
             "title": "Slice: 0 -> 32",
             "rendermode": normal + slice_at(32),
             "dimension": "overworld",
@@ -86,7 +88,7 @@ if os.environ.get('RENDER_SLICES', None):
 if os.environ.get('RENDER_NIGHT', None):
     renders.update({
         "night": {
-            "world": "My World",
+            "world": "overworld",
             "title": "Night",
             "rendermode": smooth_night,
             "dimension": "overworld",
@@ -96,7 +98,7 @@ if os.environ.get('RENDER_NIGHT', None):
 if os.environ.get('RENDER_CAVES', None):
     renders.update({
         "cave": {
-            "world": "My World",
+            "world": "overworld",
             "title": "Caves",
             "rendermode": cave,
             "dimension": "overworld",
@@ -107,7 +109,7 @@ if os.environ.get('RENDER_HEATMAP', None):
     t_now = datetime.now()
     renders.update({
         "heatmap": {
-            "world": "My World",
+            "world": "overworld",
             "title": "Heatmap",
             "rendermode": normal + [HeatmapOverlay(
                 t_invisible=int((t_now - timedelta(days=2)).timestamp()),
@@ -118,6 +120,28 @@ if os.environ.get('RENDER_HEATMAP', None):
     })
 
 
+# Other Dimensions
+if os.environ.get('RENDER_NETHER', None):
+    renders.update({
+        "nether": {
+            "world": "nether",
+            "title": "Nether",
+            "rendermode": nether_smooth_lighting,
+            "dimension": "nether",
+        },
+    })
+
+# Other Dimensions
+if os.environ.get('RENDER_END', None):
+    end_smooth_lighting = [Base(), EdgeLines(), SmoothLighting(strength=0.5)]
+    renders.update({
+        "end": {
+            "world": "the_end",
+            "title": "The End",
+            "rendermode": end_smooth_lighting,
+            "dimension": "end",
+        },
+    })
 
 
 outputdir = "/tmp/export"
