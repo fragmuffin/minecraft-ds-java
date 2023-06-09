@@ -73,14 +73,11 @@ From your minecraft client, connect to your server.
 Note: to demonstrate, I'm connecting to my local machine (127.0.0.1),
 but ideally you would put your domain, or static WAN IP here.
 
-<img src="doc/img/client-join-01-multiplayer.png" width=45% />
-<img src="doc/img/client-join-02-add-server.png" width=45% />
+<img src="doc/img/client-join-01-multiplayer.png" width=45% /> <img src="doc/img/client-join-02-add-server.png" width=45% />
 
-<img src="doc/img/client-join-03-server-address.png" width=45% />
-<img src="doc/img/client-join-04-server-list.png" width=45% />
+<img src="doc/img/client-join-03-server-address.png" width=45% /> <img src="doc/img/client-join-04-server-list.png" width=45% />
 
-<img src="doc/img/client-join-05-joined-the-game.png" width=45% />
-<img src="doc/img/client-join-06-permission.png" width=45% />
+<img src="doc/img/client-join-05-joined-the-game.png" width=45% /> <img src="doc/img/client-join-06-permission.png" width=45% />
 
 
 If you're watching the server logs, you should see your joining the game acknowledged with:
