@@ -23,6 +23,7 @@ However technically this will work on any OS that can run `docker` (and `python`
 ```bash
 sudo apt update
 sudo apt install docker-ce python3 python3-pip
+python3 -m pip install docker-compose
 ```
 
 If you want to automate initialisation, you'll also need
@@ -115,6 +116,85 @@ Added FraggyMuffin to the whitelist
 
 Press `[Ctrl]+[D]` to exit the RCON-CLI. This is likely the only time you'll need to access RCON in this way. All future commands can be done inside minecraft itself.
 
+## Online Map (Overviewer)
+
+An online map can be generated of your world, viewable online.
+
+```
+$ ./mc map
+Creating volume "minecraft-ds-java_overviewer" with default driver
+Creating minecraft-ds-java_overviewer-gen_run ... done
+2023-06-09 07:37:19  Welcome to Minecraft Overviewer version 0.19.10 (13c1bdd)!
+2023-06-09 07:37:19  Generating textures...
+2023-06-09 07:37:27  Preprocessing...
+2023-06-09 07:37:34  Rendering 1909 total tiles.
+ 99% [=====================================] 1895 23.22t/s eta 00h 00m 00s
+2023-06-09 07:38:56  Rendering complete!
+2023-06-09 07:38:57  Your render has been written to '/tmp/export', open index.html to view it.
+```
+
+You can then view it on port `8088`: http://localhost:8088
+
+<img src="doc/img/map-01-overworld.png" width=45% />
+
+Note: Switch on/off renders such as `RENDER_CAVES`, and `RENDER_NIGHT` in the [`docker-compose.yml`](./docker-compose.yml) file. Or create your own custom configuraiton by editing [`overviewer-config.py`](./overviewer-config.py) directly.
+
+## Backup
+
+Backing up couldn't be simpler than:
+
+```bash
+./mc backup
+```
+
+The first time it's run, it will create a duplicate of the `./data` folder.
+
+Each subsequent time it's run, it will only copy new, and changed files. Any files that have not chnaged since last backed up will be [hard linked](https://en.wikipedia.org/wiki/Hard_link) to the previous backup.
+
+### Restoring a backup
+
+If your world is somehow unrecoverable, and you would like to revert it to a previous day, simply:
+
+- Stop the server (`./mc stop`)
+- backup once more (`./mc backup`) [optional]
+- delete the `./data` directory (don't be afraid)
+- copy the `./backups/<folder>` to `./data`
+
+to summarise: example restoring backup: `20230609_180237`:
+
+```bash
+$ ./mc stop
+Stopping minecraft-ds-java_overviewer_1 ... done
+Stopping minecraft-ds-java_ds-java_1    ... done
+$ ./mc backup
+...
+$ rm -rf ./data
+$ cp -r backups/20230609_180237 data
+$ ./mc start
+Starting minecraft-ds-java_overviewer_1 ... done
+Starting minecraft-ds-java_ds-java_1    ... done
+```
+
+### External backup
+
+The above backup is stored alongside the server by default. Therefore this won't protect against theft, fire, hdd-wide corruption, and more.
+
+The best backup you can make is on a separate device, preferably in a different building.
+
+The easiest way to do this would be to mount an external drive (capable of hard-linking), then symlink it to the `./backups` folder.
+
+```bash
+$ mv ./backups ./backups-sidelined
+$ ln -s /media/<mountpoint> ./backups
+$ ./mc backup
+```
+
+Then consider deleting `./backups-sidelined` in +1 month.
+
+Note that copying `data-sidelined` to `/media/<mountpoint>` will likey take up a lot of space, as hard-linking is unlikely to directly translate to the remote filesystem.
+
+If this dosn't suit your purposes, please ignore the `./mc backup` feature of this project, and seek your own backup solution (there's hundreds out there)
+
 ## Cron Jobs
 
 Aim:
@@ -129,4 +209,36 @@ Now copy this to `/etc/cron.d/` to tell cron what to do and when.
 ```bash
 sudo cp tasks.cron /etc/cron.d/minecraft.cron
 sudo systemctl restart cron.service
+```
+
+## `mc` Script
+
+The [`mc`](./mc) script (short for "Minecraft") is nothing special, it's mostly a collection of `docker-compose` calls to start, stop, and perform other operations.
+
+
+```
+$ ./mc --help
+Usage: ./mc [--help] ACTION [parameters]
+
+Host Setup:
+    $ ./mc init             Initialise config files
+
+Containers:
+  Service Control:
+    $ ./mc build [service]  Builds docker containers (optional)
+    $ ./mc start [service]  Start services
+    $ ./mc stop [service]   Stop services
+    $ ./mc down             Stops and removes running containers
+
+  Status & Logs:
+    $ ./mc show             Shows running containers
+    $ ./mc logs [service]   Display and follow logs
+
+Tooling:
+  RCON Commandline Interface:
+    $ ./mc rcon             RCON interface to server (must be running)
+
+  Cron tasks
+    $ ./mc map              Genreate overviewer map files
+    $ ./mc backup           Create incremental backup of server
 ```
