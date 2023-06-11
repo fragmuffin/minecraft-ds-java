@@ -8,6 +8,7 @@ services:
     ports:
       - 25565:25565
       - 25575:25575 # remote RCON
+      - 8123:8123   # dynmap
     volumes:
       - ./data:/data
     stdin_open: true
