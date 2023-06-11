@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import pwd
 from jinja2 import Template
 
 def random_words(*args, delimiter:str='') -> str:
@@ -69,7 +70,11 @@ def generate_settings_env(templates, output, random, **_):
     # Render to File
     with open(filename_in, 'r') as file_in, open(filename_out, 'w') as file_out:
         print(f"Writing: {filename_out!r}")
-        file_out.write(Template(file_in.read()).render(**answers))
+        file_out.write(Template(file_in.read()).render(
+            UID=pwd.getpwnam(os.environ['USER']).pw_uid,
+            GID=pwd.getpwnam(os.environ['USER']).pw_gid,
+            **answers,
+        ))
 
 
 def generate_tasks_cron(templates, output, **_):
