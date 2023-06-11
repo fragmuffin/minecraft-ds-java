@@ -4,6 +4,8 @@ if [ -n "$VERBOSE" ] ; then set -x ; fi
 
 cd $(dirname $0)
 
+DOCKER_COMPOSE=docker-compose
+
 show_help() {
     [ "$@" ] && echo "$@"
 cat << ENDHELPTEXT
@@ -43,15 +45,15 @@ init() {
 
 # ====================== Container Control ======================
 build() {
-    docker-compose build "$@"
+    $DOCKER_COMPOSE build "$@"
 }
 
 start() {
-    docker-compose up -d "$@"
+    $DOCKER_COMPOSE up -d "$@"
 }
 
 stop() {
-    docker-compose stop "$@"
+    $DOCKER_COMPOSE stop "$@"
 }
 
 restart() {
@@ -60,35 +62,35 @@ restart() {
 }
 
 down() {
-    docker-compose down
+    $DOCKER_COMPOSE down
 }
 
 destroy() {
-    docker-compose kill "$@"
-    docker-compose rm -fv "$@"
+    $DOCKER_COMPOSE kill "$@"
+    $DOCKER_COMPOSE rm -fv "$@"
 }
 
 
 # ====================== Status & Logs ======================
 show() {
-    docker-compose ps
+    $DOCKER_COMPOSE ps
 }
 
 logs() {
-    docker-compose logs --tail="100" -f "$@"
+    $DOCKER_COMPOSE logs --tail="100" -f "$@"
 }
 
 
 # ====================== Tools ======================
 rcon() {
-    docker-compose exec ds-java rcon-cli "$@"
+    $DOCKER_COMPOSE exec ds-java rcon-cli "$@"
 }
 
 map() {
     # bugfix: cron job
     # mitigation for "docker-compose: command not found"... root cause unknown
     export PATH=$PATH:/usr/local/bin
-    docker-compose run --rm overviewer-gen
+    $DOCKER_COMPOSE run --rm overviewer-gen
 }
 
 backup() {
