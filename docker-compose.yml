@@ -14,6 +14,3 @@ services:
     stdin_open: true
     tty: true
     restart: unless-stopped
-
-volumes:
-  overviewer:
