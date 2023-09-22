@@ -9,7 +9,6 @@ Aims:
 - minimal setup effort
 - unrestricted potential (setup now, tweak later)
 - incremental backups
-- map generated & http hosted (using [overviewer](https://overviewer.org))
 
 ## Getting Started
 
@@ -116,28 +115,13 @@ Added FraggyMuffin to the whitelist
 
 Press `[Ctrl]+[D]` to exit the RCON-CLI. This is likely the only time you'll need to access RCON in this way. All future commands can be done inside minecraft itself.
 
-## Online Map (Overviewer)
+## Dynmap
 
-An online map can be generated of your world, viewable online.
+The [dynmap](https://github.com/webbukkit/dynmap) plugin provides a live view of the world, and players in it.
 
-```
-$ ./mc map
-Creating volume "minecraft-ds-java_overviewer" with default driver
-Creating minecraft-ds-java_overviewer-gen_run ... done
-2023-06-09 07:37:19  Welcome to Minecraft Overviewer version 0.19.10 (13c1bdd)!
-2023-06-09 07:37:19  Generating textures...
-2023-06-09 07:37:27  Preprocessing...
-2023-06-09 07:37:34  Rendering 1909 total tiles.
- 99% [=====================================] 1895 23.22t/s eta 00h 00m 00s
-2023-06-09 07:38:56  Rendering complete!
-2023-06-09 07:38:57  Your render has been written to '/tmp/export', open index.html to view it.
-```
+You can then view it on port `8123`: http://localhost:8123
 
-You can then view it on port `8088`: http://localhost:8088
-
-<img src="doc/img/map-01-overworld.png" width=45% />
-
-Note: Switch on/off renders such as `RENDER_CAVES`, and `RENDER_NIGHT` in the [`docker-compose.yml`](./docker-compose.yml) file. Or create your own custom configuraiton by editing [`overviewer-config.py`](./overviewer-config.py) directly.
+<img src="doc/img/dynmap-01-world-flat.png" width=45% />
 
 ## Backup
 
@@ -200,7 +184,6 @@ If this dosn't suit your purposes, please ignore the `./mc backup` feature of th
 Aim:
 
 - Backup daily (clear out after 30 days)
-- Generate map (CPU intensive, do during expected downtime)
 
 When running `./mc init` in the previous section, a `tasks.cron` file will have been crated.
 
@@ -239,6 +222,5 @@ Tooling:
     $ ./mc rcon             RCON interface to server (must be running)
 
   Cron tasks
-    $ ./mc map              Genreate overviewer map files
     $ ./mc backup           Create incremental backup of server
 ```

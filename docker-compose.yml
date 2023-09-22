@@ -13,37 +13,7 @@ services:
       - ./data:/data
     stdin_open: true
     tty: true
-    #restart: unless-stopped
-
-  overviewer:  # note: doesn't update automatically
-    image: python:slim
-    ports:
-      - 8088:8000
-    volumes:
-      - overviewer:/srv/www:ro
-    command: python3 -m http.server -d /srv/www
-    #restart: unless-stopped
-
-  # Tooling (not automatically run)
-  overviewer-gen:
-    image: marctv/minecraft-overviewer
-    volumes:
-      - ./data:/tmp/server:ro
-      - ./overviewer-config.py:/tmp/config/config.py:ro
-      - overviewer:/tmp/export
-    environment:
-      # Comment out to remove renders,
-      #   or edit overviewer-config.py directly.
-      #RENDER_SLICES: 1
-      #RENDER_NIGHT: 1
-      #RENDER_CAVES: 1
-      #RENDER_HEATMAP: 1
-      RENDER_NETHER: 1
-      RENDER_END: 1
-      # Logging Level
-      LOGGING_LEVEL: INFO  # set to DEBUG to learn more
-    profiles:
-      - tools
+    restart: unless-stopped
 
 volumes:
   overviewer:
