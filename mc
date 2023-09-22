@@ -30,7 +30,6 @@ Tooling:
     $ ./mc rcon             RCON interface to server (must be running)
 
   Cron tasks
-    $ ./mc map              Genreate overviewer map files
     $ ./mc backup           Create incremental backup of server
 
 ENDHELPTEXT
@@ -86,13 +85,6 @@ rcon() {
     $DOCKER_COMPOSE exec ds-java rcon-cli "$@"
 }
 
-map() {
-    # bugfix: cron job
-    # mitigation for "docker-compose: command not found"... root cause unknown
-    export PATH=$PATH:/usr/local/bin
-    $DOCKER_COMPOSE run --rm overviewer-gen
-}
-
 backup() {
     bash scripts/backup.sh
 }
@@ -117,7 +109,6 @@ case "$1" in
 
     # Tools:
     rcon)       rcon "${@:2}" ;;
-    map)        map "${@:2}" ;;
     backup)     backup "${@:2}" ;;
 
     # Help Text
