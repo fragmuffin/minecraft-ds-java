@@ -1,10 +1,12 @@
 # Folders
-backups
-data
+/backups
+/data
 
 # Genreated files
-settings.env
-tasks.cron
+/settings.env
+/tasks.cron
+/init-letsencrypt.sh
+/nginx.conf
 
 # Logs
 *.log

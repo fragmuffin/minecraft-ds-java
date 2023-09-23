@@ -54,8 +54,8 @@ def generate_settings_env(templates, output, random, **_):
             return
     
     # Ask Questions
-    questions = {  # format: {<variable>: *args, ... }
-        'SERVER_NAME': ("Name of server when viewed by a client", random_name, '<random>'),
+    questions = {  # format: {<variable>: (<question>, <default>, <default_text>), ... }
+        'SERVER_NAME': ("Name when viewed by a Minecraft client", random_name, '<random>'),
         'SEED': ("Map seed", random_seed, "<random>"),
         'MODE': ("Game mode (creative, survival, etc)", 'creative', 'creative'),
         'RCON_PASSWORD': ("Password for external RCON", random_password, '<random>'),
@@ -97,6 +97,69 @@ def generate_tasks_cron(templates, output, **_):
         file_out.write(Template(file_in.read()).render(**os.environ))
 
 
+def generate_init_letsencrypt_sh(templates, output, random, **_):
+    """
+    Generate init-letsencrypt.sh
+    """
+    filename = ('init-letsencrypt.sh', '.jinja2')
+    filename_in = os.path.join(templates, ''.join(filename))
+    filename_out = os.path.join(output, filename[0])
+
+    if os.path.exists(filename_out):
+        replace = input(f"Output file already exists: {filename_out!r}, do you want to replace it? [yN]")
+        if not replace.lower().startswith('y'):
+            print('[aborting...]')
+            return
+
+    # Ask Questions
+    questions = {  # format: {<variable>: (<question>, <default>, <default_text>), ... }
+        'SSL_DOMAIN': ("Domain getting an SSL certificate", 'example.com', 'example.com'),
+        'SSL_EMAIL': ("Email address (to pass to certbot) [optional]", '', "<empty>"),
+    }
+    answers = {}
+    for (name, (question, default, default_text)) in questions.items():
+        if random:
+            answers[name] = default() if callable(default) else default
+        else:
+            answers[name] = ask(f'{name}: {question}', default, default_text)
+
+    # Render to File
+    with open(filename_in, 'r') as file_in, open(filename_out, 'w') as file_out:
+        print(f"Writing: {filename_out!r}")
+        file_out.write(Template(file_in.read()).render(**answers))
+
+
+def generate_nginx_conf(templates, output, random, **_):
+    """
+    Generate nginx.conf
+    """
+    filename = ('nginx.conf', '.jinja2')
+    filename_in = os.path.join(templates, ''.join(filename))
+    filename_out = os.path.join(output, filename[0])
+
+    if os.path.exists(filename_out):
+        replace = input(f"Output file already exists: {filename_out!r}, do you want to replace it? [yN]")
+        if not replace.lower().startswith('y'):
+            print('[aborting...]')
+            return
+
+    # Ask Questions
+    questions = {  # format: {<variable>: (<question>, <default>, <default_text>), ... }
+        'SSL_DOMAIN': ("Domain getting an SSL certificate", 'example.com', 'example.com'),
+    }
+    answers = {}
+    for (name, (question, default, default_text)) in questions.items():
+        if random:
+            answers[name] = default() if callable(default) else default
+        else:
+            answers[name] = ask(f'{name}: {question}', default, default_text)
+
+    # Render to File
+    with open(filename_in, 'r') as file_in, open(filename_out, 'w') as file_out:
+        print(f"Writing: {filename_out!r}")
+        file_out.write(Template(file_in.read()).render(**answers))
+
+
 if __name__ == '__main__':
     import argparse
 
@@ -125,8 +188,13 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     try:
-        generate_settings_env(**vars(args))
-        generate_tasks_cron(**vars(args))
+        for func in (
+            generate_settings_env,
+            generate_tasks_cron,
+            generate_init_letsencrypt_sh,
+            generate_nginx_conf,
+        ):
+            func(**vars(args))
     except KeyboardInterrupt:
         print("\n[cancelled]")
 
