@@ -1,0 +1,43 @@
+upstream minecraft_dynmap {
+    server ds-java:8123;
+}
+
+server {
+    listen 80;
+    server_name {{ SSL_DOMAIN }};
+    server_tokens off;
+
+    # Certbot via port 80 : reading
+    #   ref: https://community.letsencrypt.org/t/renewal-acme-challenge-over-https/79482
+    #   ref: https://letsencrypt.org/docs/allow-port-80/
+
+    # Accessed to auth the first SSL certificate (for HTTPS):
+    #   - when first setting up server
+    #   - if certificate expired & needs refreshing
+    location /.well-known/acme-challenge/ { root /var/www/certbot; }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name {{ SSL_DOMAIN }};
+    server_tokens off;
+
+    ssl_certificate /etc/letsencrypt/live/{{ SSL_DOMAIN }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ SSL_DOMAIN }}/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    # Accessed to auth updating SSL certificate (for HTTPS)
+    location /.well-known/acme-challenge/ { root /var/www/certbot; }
+
+    location / {
+        proxy_pass http://minecraft_dynmap;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+        proxy_redirect off;
+    }
+}

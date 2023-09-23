@@ -44,6 +44,9 @@ This will ask you a few questions, but will randomise everything if you don't pr
 
 Note: randomising a password may be a good idea, since it will be harder to guess.
 
+Also note: if you don't intend on using `https` for dynmap, you can ignore the questions for `init-letsencrypt.sh` and `nginx.conf`.
+Or, if you do, but want to set it up later, you can always re-run `init`.
+
 ### Start Server
 
 ```bash
@@ -119,9 +122,38 @@ Press `[Ctrl]+[D]` to exit the RCON-CLI. This is likely the only time you'll nee
 
 The [dynmap](https://github.com/webbukkit/dynmap) plugin provides a live view of the world, and players in it.
 
-You can then view it on port `8123`: http://localhost:8123
+Once minecraft is running, you can view it on port `8123`: http://localhost:8123
 
 <img src="doc/img/dynmap-01-world-flat.png" width=45% />
+
+### Public HTTPS
+
+To access `dynmap` remotely, it's highly recommended you enable login support by setting the following `true` in `data/plugins/dynmap/configuration.txt`
+
+```yaml
+# Enable login support
+login-enabled: true
+# Require login to access website (requires login-enabled: true)
+login-required: true
+```
+
+And using the reverse-proxy configured in the `nginx` docker-compose service.
+
+Pre-requisites:
+
+- You have control over the host running on the domain
+- The host has ports 443, and 80 exposed (80 required for initial certification... it's a long story)
+
+If you don't own a small part of the internet (eg: an AWS EC2 instance, and root domain), don't worry. You can achieve this with a dynamic DNS (I use [`duckdns.org`](https://www.duckdns.org)), allowing you to "own" (for free) a domain like `made-up-name.duckdns.org` which can point to your house, even if your ISP doesn't provide you a static IP 👍.
+
+Once you're ready, initialise with:
+
+```bash
+bash init-letsencrypt.sh
+```
+
+If all of this confuses you, that's normal 😵‍💫.\
+To learn how this works, search for "reverse proxy with nginx and docker". I've used [`wmnnd/nginx-certbot`](https://github.com/wmnnd/nginx-certbot) as a boilerplate for this & other projects (it's brilliant).
 
 ## Backup
 
@@ -134,6 +166,7 @@ Backing up couldn't be simpler than:
 The first time it's run, it will create a duplicate of the `./data` folder.
 
 Each subsequent time it's run, it will only copy new, and changed files. Any files that have not chnaged since last backed up will be [hard linked](https://en.wikipedia.org/wiki/Hard_link) to the previous backup.
+
 
 ### Restoring a backup
 
