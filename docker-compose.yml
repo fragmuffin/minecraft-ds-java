@@ -28,8 +28,6 @@ services:
       # shared with certbot (for https certs)
       - ./data/certbot/conf:/etc/letsencrypt
       - certbot_www:/var/www/certbot
-    depends_on:
-      - django
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
     profiles: ["reverse-proxy"]
 
