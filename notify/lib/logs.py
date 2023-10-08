@@ -30,7 +30,7 @@ class LogMessage:
     REGEX_LINE = re.compile(r'''
         ^\[(?P<time_str>\d{2}:\d{2}:\d{2})\]\s* # time
         \[(?P<owner>.*?)\]:\s*                  # owner
-        (?P<message>)\s*                        # message
+        (?P<message>.*?)\s*$                    # message
     ''', re.VERBOSE)
 
     def __init__(self, date:datetime.date, time_str, owner, message):
