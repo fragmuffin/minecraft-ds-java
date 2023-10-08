@@ -74,6 +74,7 @@ RETRY_PERIOD = 0.05  # (unit: sec)
 
 def log_iter(filename, verbose=False):
     event_iter = inotify_event_gen(filename)  # 'IN_DELETE'
+    date = None  # will be set per file from file_gen()
 
     def file_gen():
         first = True
@@ -83,8 +84,11 @@ def log_iter(filename, verbose=False):
                 first = False  # if it doesn't initially exist, we'll want to see all content once it does
                 time.sleep(RETRY_PERIOD)
 
+            # Set date - to set timestamp for all log entries
+            nonlocal date
+            date = datetime.date.fromtimestamp(os.path.getctime(filename))
+
             # Seek to end of file (first file only)
-            ctime = os.path.getctime(filename)
             offset = os.path.getsize(filename) if first else 0
             first = False
 
@@ -93,10 +97,10 @@ def log_iter(filename, verbose=False):
                     print(f'logfile opened: {filename!r}')
                 if offset:
                     handle.seek(offset)
-                yield (datetime.date.fromtimestamp(ctime), handle)
+                yield handle
 
     def line_gen():
-        for (date, logfile) in file_gen():
+        for logfile in file_gen():
             file_exists = True
             while file_exists:
                 if not (line := logfile.readline()):
@@ -107,8 +111,8 @@ def log_iter(filename, verbose=False):
                             break
                     time.sleep(RETRY_PERIOD)
                     continue
-                yield (date, line.rstrip())
+                yield line.rstrip()
     
-    for (date, line) in line_gen():
+    for line in line_gen():
         yield LogMessage.from_string(date, line)
 
