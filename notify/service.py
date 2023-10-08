@@ -18,8 +18,8 @@ def main():
     )
     args = parser.parse_args()
     
-    hooks = list(webhooks.default_gen())    
-    for msg in logs.log_iter(args.logfile, verbose=True):
+    hooks = list(webhooks.default_gen())
+    for msg in logs.LogMessage.from_file_gen(args.logfile, verbose=True):
         for hook in hooks:
             if hook.process(msg):
                 print(f"sent webhook: {hook}")

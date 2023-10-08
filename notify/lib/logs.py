@@ -7,6 +7,24 @@ import os
 import datetime
 
 
+def inotify_event_gen(filename):
+    import os.path
+    filename = os.path.normpath(filename)
+    (path, fname) = os.path.split(filename if os.path.isabs(filename) else f'./{filename}')
+
+    from inotify.adapters import Inotify
+    notifier = Inotify(block_duration_s=0)
+    notifier.add_watch(path)
+
+    for event in notifier.event_gen(timeout_s=None, yield_nones=True):
+        if event is None:
+            yield None
+            continue
+        (_, _, e_path, e_filename) = event
+        if (e_path, e_filename) == (path, fname):
+            yield event
+
+
 class LogMessage:
     # Message Examples:
     # [06:25:20] [Server thread/INFO]: Preparing start region for dimension minecraft:the_end
@@ -32,6 +50,7 @@ class LogMessage:
         \[(?P<owner>.*?)\]:\s*                  # owner
         (?P<message>.*?)\s*$                    # message
     ''', re.VERBOSE)
+    RETRY_PERIOD = 0.05  # (unit: sec)
 
     def __init__(self, date:datetime.date, time_str, owner, message):
         self.date = date
@@ -40,7 +59,7 @@ class LogMessage:
         self.message = message
     
     @classmethod
-    def from_string(cls, date:datetime.date, line):
+    def from_string(cls, line, date:datetime.date=datetime.date.today()):
         if (match := cls.REGEX_LINE.search(line)):
             return cls(date=date, **match.groupdict())
 
@@ -51,68 +70,49 @@ class LogMessage:
     def __str__(self):
         return f"[{self.datetime.isoformat()}] [{self.owner}] {self.message}"
 
+    @classmethod
+    def from_file_gen(cls, filename, verbose=False):
+        event_iter = inotify_event_gen(filename)  # 'IN_DELETE'
+        date = None  # will be set per file from file_gen()
 
-def inotify_event_gen(filename):
-    import os.path
-    filename = os.path.normpath(filename)
-    (path, fname) = os.path.split(filename if os.path.isabs(filename) else f'./{filename}')
+        def file_gen():
+            first = True
+            while True:
+                # wait for file to exist
+                while not os.path.exists(filename):
+                    first = False  # if it doesn't initially exist, we'll want to see all content once it does
+                    time.sleep(cls.RETRY_PERIOD)
 
-    from inotify.adapters import Inotify
-    notifier = Inotify(block_duration_s=0)
-    notifier.add_watch(path)
+                # Set date - to set timestamp for all log entries
+                nonlocal date
+                date = datetime.date.fromtimestamp(os.path.getctime(filename))
 
-    for event in notifier.event_gen(timeout_s=None, yield_nones=True):
-        if event is None:
-            yield None
-            continue
-        (_, _, e_path, e_filename) = event
-        if (e_path, e_filename) == (path, fname):
-            yield event
+                # Seek to end of file (first file only)
+                offset = os.path.getsize(filename) if first else 0
+                first = False
 
+                with open(filename, 'r') as handle:
+                    if verbose:
+                        print(f'logfile opened: {filename!r}')
+                    if offset:
+                        handle.seek(offset)
+                    yield handle
 
-RETRY_PERIOD = 0.05  # (unit: sec)
-
-def log_iter(filename, verbose=False):
-    event_iter = inotify_event_gen(filename)  # 'IN_DELETE'
-    date = None  # will be set per file from file_gen()
-
-    def file_gen():
-        first = True
-        while True:
-            # wait for file to exist
-            while not os.path.exists(filename):
-                first = False  # if it doesn't initially exist, we'll want to see all content once it does
-                time.sleep(RETRY_PERIOD)
-
-            # Set date - to set timestamp for all log entries
-            nonlocal date
-            date = datetime.date.fromtimestamp(os.path.getctime(filename))
-
-            # Seek to end of file (first file only)
-            offset = os.path.getsize(filename) if first else 0
-            first = False
-
-            with open(filename, 'r') as handle:
-                if verbose:
-                    print(f'logfile opened: {filename!r}')
-                if offset:
-                    handle.seek(offset)
-                yield handle
-
-    def line_gen():
-        for logfile in file_gen():
-            file_exists = True
-            while file_exists:
-                if not (line := logfile.readline()):
-                    while (event := next(event_iter)):
-                        (_, e_types, _, _) = event
-                        if 'IN_DELETE' in e_types:
-                            file_exists = False
-                            break
-                    time.sleep(RETRY_PERIOD)
-                    continue
-                yield line.rstrip()
-    
-    for line in line_gen():
-        yield LogMessage.from_string(date, line)
+        def line_gen():
+            for logfile in file_gen():
+                file_exists = True
+                while file_exists:
+                    if not (line := logfile.readline()):
+                        while (event := next(event_iter)):
+                            (_, e_types, _, _) = event
+                            if 'IN_DELETE' in e_types:
+                                file_exists = False
+                                break
+                        time.sleep(cls.RETRY_PERIOD)
+                        continue
+                    yield line.rstrip()
+        
+        for line in line_gen():
+            if (logentry := cls.from_string(line=line, date=date)):
+                yield logentry
 
