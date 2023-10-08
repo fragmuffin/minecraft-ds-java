@@ -8,6 +8,12 @@
 /init-letsencrypt.sh
 /nginx.conf
 
+# Manual files
+/notify/keys.env
+
 # Logs
 *.log
 
+# Python
+__pycache__/
+/.venv/

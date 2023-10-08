@@ -7,9 +7,9 @@ services:
     env_file:
       - ./settings.env
     ports:
-      - 25565:25565
-      - 25575:25575 # remote RCON
-      - 8123:8123   # dynmap
+      - 25565:25565 # minecraft server
+      - 25575:25575 # Remote CONnection (RCON command interface)
+      - 8123:8123   # dynmap (mapping plugin, http)
     volumes:
       - ./data:/data
     stdin_open: true
@@ -39,6 +39,18 @@ services:
       - certbot_www:/var/www/certbot/
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
     profiles: ["reverse-proxy"]
+
+  # Notifications
+  notify:
+    build: notify
+    restart: unless-stopped
+    env_file:
+      - ./notify/keys.env
+    volumes:
+      - ./notify:/code
+      - ./data/logs:/var/logs:ro
+    profiles: ["optional"]
+    command: "python /code/service.py --logfile=/var/logs/latest.log"
 
 volumes:
   certbot_www:
