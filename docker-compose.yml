@@ -43,7 +43,7 @@ services:
   # Notifications
   notify:
     build: notify
-    #restart: unless-stopped
+    restart: unless-stopped
     env_file:
       - ./notify/keys.env
     volumes:
