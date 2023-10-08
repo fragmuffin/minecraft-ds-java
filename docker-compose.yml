@@ -50,7 +50,7 @@ services:
       - ./notify:/code
       - ./data/logs:/var/logs:ro
     profiles: ["optional"]
-    command: "python /code/service.py"
+    command: "python /code/service.py --logfile=/var/logs/latest.log"
 
 volumes:
   certbot_www:
