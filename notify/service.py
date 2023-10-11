@@ -25,7 +25,7 @@ def main():
     parser.add_argument(
         '--debug', dest='loglevel',
         action='store_const', const=logging.DEBUG,
-        default=logging.DEBUG if os.environ.get('DEBUG', '').lower() in AFFIRMATIVE else logging.INFO,
+        default=logging.DEBUG if os.environ.get('NOTIFY_DEBUG', '').lower() in AFFIRMATIVE else logging.INFO,
         help="Log all the things",
     )
     args = parser.parse_args()
