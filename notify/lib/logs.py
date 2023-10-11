@@ -110,7 +110,7 @@ class LogMessage:
                     if not (line := logfile.readline()):
                         while (event := next(event_iter)):
                             (_, e_types, _, _) = event
-                            if 'IN_DELETE' in e_types:
+                            if any(x in e_types for x in ('IN_DELETE', 'IN_MOVED_FROM')):
                                 file_exists = False
                                 break
                         time.sleep(cls.RETRY_PERIOD)
