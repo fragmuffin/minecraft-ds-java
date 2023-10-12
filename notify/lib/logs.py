@@ -130,8 +130,8 @@ class LogMessage:
                 yield logentry
 
     @property
-    def type(self):
+    def type(self) -> tuple[str, re.Match|None]:
         """Identify a log message as a particular type"""
         if self._type is None:
-            (self._type, _) = log_types.detect(self.message)
+            self._type = log_types.detect(self.message)
         return self._type

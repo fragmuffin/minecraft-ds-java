@@ -146,11 +146,15 @@ _TEMPLATES = {
     # --- Join / Leave
     'player:join': [
         "<player> joined the game",
+    ],
+    'player:join:detailed': [
         r"<player>\[(?P<client>.*?)\] logged in with entity id (?P<id>\d+) at \(\[(?P<world>\w+)\]\s*(?P<x>-?\d+(\.\d+)?)\s*,\s*(?P<y>-?\d+(\.\d+)?)\s*,\s*(?P<z>-?\d+(\.\d+)?)\s*\)",
     ],
     'player:leave': [
-        r"<player> lost connection: (?P<reason>.*?)",
         "<player> left the game",
+    ],
+    'player:leave:detailed': [
+        r"<player> lost connection: (?P<reason>.*?)",
     ],
 
     # --- Advancement
@@ -217,10 +221,10 @@ if __name__ == '__main__':
     
     class TestLogMessages(unittest.TestCase):
         DATA = {  # format: {name: (type, input), ...} - taken directly from server logs
-            'join1':    ('player:join',     "FraggyMuffin joined the game"),
-            'join2':    ('player:join',     "FraggyMuffin[/172.25.0.1:39356] logged in with entity id 27 at ([world]9.5, 80.0, -2.5)"),
-            'leave1':   ('player:leave',    "FraggyMuffin lost connection: Disconnected"),
-            'leave2':   ('player:leave',    "FraggyMuffin left the game"),
+            'join1':    ('player:join',             "FraggyMuffin joined the game"),
+            'join2':    ('player:join:detailed',    "FraggyMuffin[/172.25.0.1:39356] logged in with entity id 27 at ([world]9.5, 80.0, -2.5)"),
+            'leave1':   ('player:leave:detailed',   "FraggyMuffin lost connection: Disconnected"),
+            'leave2':   ('player:leave',            "FraggyMuffin left the game"),
             'advance':  ('player:advancement',      "FraggyMuffin has made the advancement [Monster Hunter]"),
             'death1':   ('player:death:falling',    "SomeDude fell from a high place"),
             'death2':   ('player:death:lava',       "SomeDude tried to swim in lava"),

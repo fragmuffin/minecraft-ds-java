@@ -9,8 +9,6 @@ from .core import Notifier, register, LogMessage
 
 @register
 class Slack(Notifier):
-    REGEX_JOINED = re.compile(r'^(?P<user>\S+) joined the game$')
-
     def __init__(self, host, path):
         self.host = host
         self.path = path
@@ -27,7 +25,12 @@ class Slack(Notifier):
 
     def process(self, msg:LogMessage):
         # TODO: add server errors & stuff? (currently only loggs people joining)
-        if (match := self.REGEX_JOINED.search(msg.message)):
+        (key, _) = msg.type
+        if any((
+            key == 'player:join',
+            key == 'player:advancement',
+            key.startswith('player:death'),
+        )):
             return self.send(message=msg.message)
 
     def send(self, message):
