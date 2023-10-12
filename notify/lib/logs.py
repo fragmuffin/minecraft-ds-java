@@ -5,6 +5,9 @@ import time
 import re
 import os
 import datetime
+import logging
+
+log = logging.getLogger(__name__)
 
 
 def inotify_event_gen(filename):
@@ -22,6 +25,7 @@ def inotify_event_gen(filename):
             continue
         (_, _, e_path, e_filename) = event
         if (e_path, e_filename) == (path, fname):
+            log.debug("inotify event: %r", event)
             yield event
 
 
@@ -76,7 +80,7 @@ class LogMessage:
         return f"[{self.datetime.isoformat()}] [{self.owner}] {self.message}"
 
     @classmethod
-    def from_file_gen(cls, filename, verbose=False):
+    def from_file_gen(cls, filename):
         event_iter = inotify_event_gen(filename)  # 'IN_DELETE'
         date = None  # will be set per file from file_gen()
 
@@ -84,6 +88,7 @@ class LogMessage:
             first = True
             while True:
                 # wait for file to exist
+                log.debug("looking for file: %r", filename)
                 while not os.path.exists(filename):
                     first = False  # if it doesn't initially exist, we'll want to see all content once it does
                     time.sleep(cls.RETRY_PERIOD)
@@ -96,9 +101,9 @@ class LogMessage:
                 offset = os.path.getsize(filename) if first else 0
                 first = False
 
+                log.info("opening logfile: %r", filename)
+                log.debug("date=%r, offset=%r", date, offset)
                 with open(filename, 'r') as handle:
-                    if verbose:
-                        print(f'logfile opened: {filename!r}')
                     if offset:
                         handle.seek(offset)
                     yield handle
@@ -110,11 +115,12 @@ class LogMessage:
                     if not (line := logfile.readline()):
                         while (event := next(event_iter)):
                             (_, e_types, _, _) = event
-                            if 'IN_DELETE' in e_types:
+                            if any(x in e_types for x in ('IN_DELETE', 'IN_MOVED_FROM')):
                                 file_exists = False
                                 break
                         time.sleep(cls.RETRY_PERIOD)
                         continue
+                    log.debug("log entry: %r", line)
                     yield line.rstrip()
         
         for line in line_gen():
