@@ -7,6 +7,8 @@ import os
 import datetime
 import logging
 
+import log_types
+
 log = logging.getLogger(__name__)
 
 
@@ -46,14 +48,17 @@ class LogMessage:
     # [12:15:08] [Server thread/WARN]: [!] The timings profiler has been enabled but has been scheduled for removal from Paper in the future.
     #     We recommend installing the spark profiler as a replacement: https://spark.lucko.me/
     #     For more information please visit: https://github.com/PaperMC/Paper/issues/8948
+    # [12:17:11] [Server thread/INFO]: FraggyMuffin has made the advancement [Monster Hunter]
+    # [02:13:12] [Server thread/INFO]: SomeDude fell from a high place
+    # [02:23:19] [Server thread/INFO]: SomeDude tried to swim in lava
 
     # Note: I'm going to ignore lines that don't start with [<timestamp>] for now
 
-    REGEX_LINE = re.compile(r'''
-        ^\[(?P<time_str>\d{2}:\d{2}:\d{2})\]\s* # time
+    REGEX_LINE = re.compile(r'''^\s*
+        \[(?P<time_str>\d{2}:\d{2}:\d{2})\]\s*  # time (no date)
         \[(?P<owner>.*?)\]:\s*                  # owner
-        (?P<message>.*?)\s*$                    # message
-    ''', re.VERBOSE)
+        (?P<message>.*?)\s*                     # message
+    $''', re.VERBOSE)
     RETRY_PERIOD = 0.05  # (unit: sec)
 
     def __init__(self, date:datetime.date, time_str, owner, message):
@@ -61,6 +66,8 @@ class LogMessage:
         self.time = datetime.time.fromisoformat(time_str)
         self.owner = owner
         self.message = message
+
+        self._type = None
     
     @classmethod
     def from_string(cls, line, date:datetime.date=datetime.date.today()):
@@ -122,3 +129,9 @@ class LogMessage:
             if (logentry := cls.from_string(line=line, date=date)):
                 yield logentry
 
+    @property
+    def type(self) -> tuple[str, re.Match|None]:
+        """Identify a log message as a particular type"""
+        if self._type is None:
+            self._type = log_types.detect(self.message)
+        return self._type

@@ -9,7 +9,6 @@ from .core import Notifier, register, LogMessage
 @register
 class Pushover(Notifier):
     API_URL = 'api.pushover.net:443'
-    REGEX_JOINED = re.compile(r'^(?P<user>\S+) joined the game$')
 
     def __init__(self, user_key, app_token):
         self.user_key = user_key
@@ -25,9 +24,10 @@ class Pushover(Notifier):
     
     def process(self, msg:LogMessage):
         # TODO: add server errors & stuff? (currently only loggs people joining)
-        if (match := self.REGEX_JOINED.search(msg.message)):
+        (key, match) = msg.type
+        if key == 'player:join':
             return self.send(
-                title=match.group('user'),
+                title=match.group('player'),
                 message=msg.message,
             )
     
