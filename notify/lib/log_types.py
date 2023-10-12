@@ -28,7 +28,7 @@ _TEMPLATES = {
         "<player> blew up",
         "<player> was blown up by <player/mob>",
         "<player> was blown up by <player/mob> using <item>",
-        "<player> was killed by \[Intentional Game Design\]",
+        r"<player> was killed by \[Intentional Game Design\]",
     ],
     'player:death:falling': [
         "<player> hit the ground too hard",
