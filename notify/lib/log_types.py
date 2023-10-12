@@ -220,7 +220,7 @@ if __name__ == '__main__':
     import unittest
     
     class TestLogMessages(unittest.TestCase):
-        DATA = {  # format: {name: (type, input), ...} - taken directly from server logs
+        DATA = {  # format: {name: (type, input), ...}
             'join1':    ('player:join',             "FraggyMuffin joined the game"),
             'join2':    ('player:join:detailed',    "FraggyMuffin[/172.25.0.1:39356] logged in with entity id 27 at ([world]9.5, 80.0, -2.5)"),
             'leave1':   ('player:leave:detailed',   "FraggyMuffin lost connection: Disconnected"),
@@ -228,6 +228,14 @@ if __name__ == '__main__':
             'advance':  ('player:advancement',      "FraggyMuffin has made the advancement [Monster Hunter]"),
             'death1':   ('player:death:falling',    "SomeDude fell from a high place"),
             'death2':   ('player:death:lava',       "SomeDude tried to swim in lava"),
+            'death3':   ('player:death:killed',     "FraggyMuffin was slain by Zombie"),
+            'death4':   ('player:death:falling',    "FraggyMuffin was doomed to fall by Creeper"),
+            'death5':   ('player:death:falling',    "FraggyMuffin was doomed to fall by Some Mob"),
+            'death6':   ('player:death:explosions', "Name With_Space was blown up by Creeper"),
+            'death7':   ('player:death:falling',    "FraggyMuffin fell from a high place"),
+            'death8':   ('player:death:generic',    "FraggyMuffin died"),
+            'death9':   ('player:death:generic',    "   FraggyMuffin died   "),
+            'deaty10':  ('player:death:explosions', "FraggyMuffin was killed by [Intentional Game Design]"),
             'other':    ('unknown',                 "blah blah"),
         }
 
