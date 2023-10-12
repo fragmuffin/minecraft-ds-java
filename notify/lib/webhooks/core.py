@@ -5,6 +5,9 @@ from logs import LogMessage
 
 
 class Notifier(ABC):
+    def __repr__(self):
+        return f"<{type(self).__name__}:{hex(id(self))}>"
+
     @classmethod
     @abstractmethod
     def from_environ(cls):
