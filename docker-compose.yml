@@ -8,9 +8,10 @@ services:
       - ./settings.common.env
       - ./settings.env
     ports:
-      - 25565:25565 # minecraft server
-      - 25575:25575 # Remote CONnection (RCON command interface)
-      - 8123:8123   # dynmap (mapping plugin, http)
+      - 25565:25565     # minecraft server
+      - 25575:25575     # Remote CONnection (RCON command interface)
+      - 8123:8123       # dynmap (mapping plugin, http)
+      - 24454:24454/udp # mod: simple-voice-chat
     volumes:
       - ./data:/data
     stdin_open: true
