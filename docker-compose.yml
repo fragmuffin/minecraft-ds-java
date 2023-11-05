@@ -5,6 +5,7 @@ services:
     image: itzg/minecraft-server
     restart: unless-stopped
     env_file:
+      - ./settings.common.env
       - ./settings.env
     ports:
       - 25565:25565 # minecraft server
