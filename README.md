@@ -69,7 +69,15 @@ To see the server's running comentary of what it's doing (or possibly how it fai
 
 Then press `[Ctrl]+[C]` to stop viewing the logs.
 
-### Join Server
+### Client Setup
+
+#### Mods / Plugins
+
+To take full advantage of the server, the following mods may be installed [optional]
+
+- [simple-voice-chat](https://modrinth.com/plugin/simple-voice-chat)
+
+#### Join Server
 
 From your minecraft client, connect to your server.
 
