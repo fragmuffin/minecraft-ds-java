@@ -17,10 +17,11 @@ mkdir -p "${BACKUP_DIR}"
 
 # Perform Sync
 rsync -av --delete \
+    --ignore-errors \
     "$SOURCE_DIR/" \
     --link-dest "$LATEST_LINK" \
     --exclude=".cache" \
-    "$BACKUP_PATH/"
+    "$BACKUP_PATH/" || true
 
 # Cleanup
 rm -rf "$LATEST_LINK"
@@ -34,7 +35,7 @@ for bak_path in $(find "$BACKUP_DIR" -maxdepth 1 -mindepth 1 -type d) ; do
         bak_dt=$(echo $bak_name | sed -r 's/(....)(..)(..)_(..)(..)(..)/\1-\2-\3 \4:\5:\6/')
         bak_epoch=$(date -d "$bak_dt" +%s)
         if [ $bak_epoch -lt $cutoff_epoch ]; then
-            rm -rf "$bak_path"
+            rm -rfv "$bak_path"
         fi
     fi
 done
